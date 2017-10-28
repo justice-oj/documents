@@ -1,6 +1,18 @@
+# Introduction
+
+[Justice](https://www.justice.plus/) is an [online-judge system](https://en.wikipedia.org/wiki/Online_judge) which supports Java, C and CPP.
+
+Now `Justice` is composed of three parts:
+
+- [justice-frontend](https://github.com/liupangzi/justice-frontend): the website of `Justice` online judge with an additional admin control panel, powered by yii2;
+
+- [justice-dispatcher](https://github.com/liupangzi/justice-dispatcher): dispatches submissions to a local worker(AKA `justice-sandbox`) and fetches the results, powered by spring-boot;
+
+- [justice-sandbox](https://github.com/liupangzi/justice-sandbox): yet another sandbox written in Go, providing kernel-based namespace and cgroup isolation. 
+
 # Deployment Guide
 
-This is a deployment guide for [Justice](https://www.justice.plus/) online judge.
+Here is a deployment guide for [Justice](https://www.justice.plus/) online judge.
 
 ![Architecture](/images/architecture.png)
 
