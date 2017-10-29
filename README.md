@@ -20,11 +20,11 @@ The picture above describes the main judging process of `Justice`:
 
 - user submits a piece of code, `justice-frontend` then updates MySQL and puts the judge submission to RabbitMQ;
 
-- `justice-dispatcher` fetches the judge submission from RabbitMQ, delegates it to `justice-sandbox`;
+- `justice-dispatcher` fetches the judge submission from RabbitMQ: if the submitted code is written in Java, the dispatcher will judge the code itself, or it will delegate the code to `justice-sandbox` for judging;
 
 - `justice-sandbox` runs the submitted code in a jailed environment, and returns the judge result in a json-encoded string;
 
-- `justice-dispatcher` then updates MySQL with the result decoded from `justice-sandbox`.
+- `justice-dispatcher` then updates MySQL / Redis with the result decoded from `justice-sandbox`.
 
 For now [Justice](https://www.justice.plus/) is tested on [Ubuntu 16.04 LTS](http://releases.ubuntu.com/16.04/) only, migrating the following instructions to any other dist may cause security issues.
 
