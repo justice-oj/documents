@@ -128,7 +128,7 @@ bind <b><i>192.168.216.128</i></b>
 # git clone https://github.com/liupangzi/justice-frontend.git /var/www/justice.plus
 
 # cd /var/www/justice.plus
-# composer global require "fxp/composer-asset-plugin:^1.2.0"
+# composer global require "fxp/composer-asset-plugin:^1.4.2"
 # composer install
 ```
 
