@@ -4,11 +4,11 @@
 
 Now `Justice` is composed of three parts:
 
-- [justice-frontend](https://github.com/liupangzi/justice-frontend): the website of `Justice` online judge with an additional admin control panel, powered by yii2;
+- [frontend](https://github.com/justice-oj/frontend): the website of `Justice` online judge with an additional admin control panel, powered by yii2;
 
-- [justice-dispatcher](https://github.com/liupangzi/justice-dispatcher): dispatches submissions to a local worker(AKA `justice-sandbox`) and fetches the results, powered by spring-boot;
+- [dispatcher](https://github.com/justice-oj/dispatcher): dispatches submissions to a local worker(AKA `justice-sandbox`) and fetches the results, powered by spring-boot;
 
-- [justice-sandbox](https://github.com/liupangzi/justice-sandbox): yet another sandbox written in Go, providing kernel-based namespace and cgroup isolation. 
+- [sandbox](https://github.com/justice-oj/sandbox): yet another sandbox written in Go, providing kernel-based namespace and cgroup isolation.
 
 # Blogs about Justice
 [Blogs](https://tech.liuchao.me/tag/justice-oj/)
@@ -128,7 +128,7 @@ bind <b><i>192.168.216.128</i></b>
 
 ```bash
 # mkdir -p /var/www
-# git clone https://github.com/liupangzi/justice-frontend.git /var/www/justice.plus
+# git clone git@github.com:justice-oj/frontend.git /var/www/justice.plus
 
 # cd /var/www/justice.plus
 # composer global require "fxp/composer-asset-plugin:^1.4.2"
@@ -327,7 +327,7 @@ server {
 - Checkout project in `/opt`
 ```bash
 # cd /opt
-# git clone https://github.com/liupangzi/justice-sandbox.git
+# git clone git@github.com:justice-oj/sandbox.git
 ```
 
 - Init(compile binaries, enable [cgroup auto clean-up](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/sec-common_tunable_parameters), etc)
