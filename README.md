@@ -280,7 +280,18 @@ server {
 
 ## Dispatcher
 
-- Dispatcher requires [JDK8](http://www.oracle.com/technetwork/pt/java/javase/downloads/jdk8-downloads-2133151.html) and [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
+- Install JDK 8
+```bash
+apt install -y openjdk-8-jre-headless
+```
+
+- Install Tomcat 8.5
+```bash
+cd /opt
+wget http://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.31/bin/apache-tomcat-8.5.31.tar.gz
+tar zxf apache-tomcat-8.5.31.tar.gz
+mv apache-tomcat-8.5.31 tomcat-justice-dispatcher
+```
 
 - Update `conf/catalina.properties`, ${ENV} must be in one of `local`, `test` or `prod`:
 ```ini
@@ -293,17 +304,20 @@ server {
 - Deploy .war and start Tomcat
 ```bash
 mkdir -p /var/log/justice/code
-bin/startup.sh
+./bin/startup.sh
 ```
 
 ## Sandbox
 
-- Sandbox requires [Go](https://golang.org/doc/install)
+- Install Golang
+```bash
+apt install -y golang-go
+```
 
-- Checkout project in `/opt`
+- Checkout project in `/opt/justice-sandbox`
 ```bash
 cd /opt
-git clone git@github.com:justice-oj/sandbox.git
+git clone git@github.com:justice-oj/sandbox.git justice-sandbox
 ```
 
 - Init(compile binaries, enable [cgroup auto clean-up](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/sec-common_tunable_parameters), etc)
