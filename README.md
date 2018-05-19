@@ -29,80 +29,93 @@ The picture above describes the main judging process of `Justice`:
 
 - `justice-dispatcher` then updates MySQL / Redis with the result decoded from `justice-sandbox`.
 
-For now [Justice](https://www.justice.plus/) is tested on [Ubuntu 16.04 LTS](http://releases.ubuntu.com/16.04/) only, migrating the following instructions to any other dist may cause security issues.
+For now [Justice](https://www.justice.plus/) is tested on [Ubuntu 18.04 LTS](http://releases.ubuntu.com/18.04/) only, migrating the following instructions to any other dist may cause security issues.
 
 ## Components
 
+### IP aliases
+
+Replace the following ip addresses in your hosts file for justice dev environment.
+
+```text
+192.168.17.128 justice.mysql
+192.168.17.128 justice.rabbitmq
+192.168.17.128 justice.redis
+```
+
 ### MySQL
 
-- Follow [this instruction](https://www.percona.com/doc/percona-server/LATEST/installation/apt_repo.html#installing-percona-server-on-debian-and-ubuntu) to install Percona Server.
+- Install MySQL Server:
+```bash
+apt install -y mysql-server
+mysql_secure_installation
+```
 
 - Create database for our app:
-```
-> CREATE DATABASE www_justice_plus;
+```mysql
+CREATE DATABASE www_justice_plus;
 ```
 
-- Update `/etc/mysql/percona-server.conf.d/mysqld.cnf`:
+- Update `/etc/mysql/mysql.conf.d/mysqld.cnf`, and replace `${justice.mysql}` with your own IP address:
 <pre>
-+ bind-address = <b><i>192.168.216.128</i></b>
++ bind-address = <b><i>${justice.mysql}</i></b>
 </pre>
 
-- Restart Percona Server:
-```
-# /etc/init.d/mysql restart
+- Restart MySQL Server:
+```bash
+/etc/init.d/mysql restart
 ```
 
 ### RabbitMQ
 
 - Install RabbitMQ:
 ```bash
-# apt install -y rabbitmq-server
+apt install -y rabbitmq-server
 ```
 
-- Enable `rabbitmq_management` plugin, and replace ${PASSWORD} with your own password:
+- Enable `rabbitmq_management` plugin, and replace ${password} with your own password:
 ```bash
-# rabbitmq-plugins enable rabbitmq_management
-# rabbitmqctl add_user justice ${PASSWORD}
-# rabbitmqctl set_user_tags justice administrator
-# rabbitmqctl set_permissions -p / justice ".*" ".*" ".*"
+rabbitmq-plugins enable rabbitmq_management
+rabbitmqctl add_user justice ${password}
+rabbitmqctl set_user_tags justice administrator
+rabbitmqctl set_permissions -p / justice ".*" ".*" ".*"
 ```
 
-- Update `/etc/rabbitmq/rabbitmq-env.conf`:
+- Update `/etc/rabbitmq/rabbitmq-env.conf`, and replace `${justice.rabbitmq}` with your own IP address:
 <pre>
 NODENAME=justice
-NODE_IP_ADDRESS=<b><i>192.168.216.128</i></b>
+NODE_IP_ADDRESS=<b><i>${justice.rabbitmq}</i></b>
 NODE_PORT=5672
 </pre>
 
 - Restart RabbitMQ:
 ```bash
-# /etc/init.d/rabbitmq-server restart
+/etc/init.d/rabbitmq-server restart
 ```
 
 ### Redis
 
 - Install Redis
 ```bash
-# apt install -y software-properties-common
-# add-apt-repository ppa:chris-lea/redis-server
-# apt update -y
-# apt install -y redis-server
+add-apt-repository ppa:chris-lea/redis-server
+apt update -y
+apt install -y redis-server
 ```
 
-- Update `/etc/redis/redis.conf`:
+- Update `/etc/redis/redis.conf`, and replace `${justice.redis}` with your own IP address:
 <pre>
-bind <b><i>192.168.216.128</i></b>
+bind <b><i>${justice.redis}</i></b>
 </pre>
 
 - Restart Redis:
 ```bash
-# /etc/init.d/redis-server restart
+/etc/init.d/redis-server restart
 ```
 
 ### Sentry
 
 ```bash
-# apt install -y make docker.io
+apt install -y make docker.io
 ```
 
 - Follow [this instruction](https://docs.sentry.io/server/installation/docker/) to install Sentry.
@@ -111,79 +124,46 @@ bind <b><i>192.168.216.128</i></b>
 
 ### PHP
 
-- PHP 7.1:
+- Install PHP 7.2:
 ```bash
-# apt install -y python-software-properties
-# add-apt-repository -y ppa:ondrej/php
-# apt update -y
-# apt install -y php7.1-xml php7.1-mbstring php7.1-zip php7.1-mysql php7.1 php7.1-opcache php7.1-json php7.1-xmlrpc php7.1-curl php7.1-bz2 php7.1-cgi php7.1-cli php7.1-fpm php7.1-gmp php7.1-common php7.1-bcmath php7.1-mcrypt php7.1-gd
+add-apt-repository -y ppa:ondrej/php
+apt update -y
+apt install -y php7.2-xml php7.2-mbstring php7.2-zip php7.2-mysql php7.2 php7.2-opcache php7.2-json php7.2-xmlrpc php7.2-curl php7.2-bz2 php7.2-cgi php7.2-cli php7.2-fpm php7.2-gmp php7.2-common php7.2-bcmath php7.2-gd
 ```
 
 - Composer
-```
-# curl -o /usr/local/bin/composer https://getcomposer.org/composer.phar && chmod +x /usr/local/bin/composer
+```bash
+curl -o /usr/local/bin/composer https://getcomposer.org/composer.phar && chmod +x /usr/local/bin/composer
 ```
 
 ### Init project
 
 ```bash
-# mkdir -p /var/www
-# git clone git@github.com:justice-oj/frontend.git /var/www/justice.plus
+mkdir -p /var/www
+git clone git@github.com:justice-oj/frontend.git /var/www/justice.plus
 
-# cd /var/www/justice.plus
-# composer global require "fxp/composer-asset-plugin:^1.4.2"
-# composer install
+cd /var/www/justice.plus
+composer global require "fxp/composer-asset-plugin:^1.4.2"
+composer install
 ```
 
 #### **For Development environment**
 
-- Update config `justice.plus/environments/dev/common/config/main-local.php` for MySQL / Redis and RabbitMQ:
-<pre>
-[
-    'components' => [
-        'db' => [
-            'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=<b><i>192.168.216.128</i></b>;dbname=www_justice_plus',
-            'username' => '<b><i>root</i></b>',
-            'password' => '<b><i>xaiTIVP7kB$oHuJecEooq#YsziVvVAzW</i></b>',
-            'charset' => 'utf8',
-        ],
-        'redis' => [
-            'class' => 'yii\redis\Connection',
-            'hostname' => '<b><i>192.168.216.128</i></b>',
-            'port' => 6379,
-            'database' => 15,
-        ],
-        'rabbitMQ' => [
-            'class' => \common\components\queue\BasicRabbitMQProducer::class,
-            'host' => '<b><i>192.168.216.128</i></b>',
-            'port' => 5672,
-            'user' => 'justice',
-            'password' => '<b><i>justice</i></b>',
-            'queueName' => 'justice',
-            'exchangeName' => 'justice',
-            'exchangeType' => 'topic',
-        ],
-    ],
-];
-</pre>
-
 - Update config `justice.plus/environments/dev/common/config/params-local.php` for sentry:
 <pre>
 [
-    'sentryDSN' => '<b><i>http://f3ed86b6e6bd4c6a8c7f1ebf77d65dff:b616b38dc3cd438fbc4ffd789bed18d4@192.168.216.128:12000/2</i></b>',
+    'sentryDSN' => '<b><i>${sentry_url}</i></b>',
 ];
 </pre>
 
 - Init yii2 project
 ```bash
-# cd /var/www/justice.plus
-# php init --env=Development --overwrite=All
-# php yii migrate
-# php yii fixture "*"
-# chown -R www-data:www-data /var/www/justice.plus
-# php yii serve --docroot="www/web" localhost:8888
-# php yii serve --docroot="admin/web" localhost:9999
+cd /var/www/justice.plus
+php init --env=Development --overwrite=All
+php yii migrate
+php yii fixture "*"
+php yii serve --docroot="www/web" localhost:8888
+php yii serve --docroot="admin/web" localhost:9999
 ```
 
 #### **For Production environment**
@@ -194,23 +174,23 @@ bind <b><i>192.168.216.128</i></b>
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=<b><i>127.0.0.1</i></b>;dbname=www_justice_plus',
+            'dsn' => 'mysql:host=<b><i>${justice.mysql}</i></b>;dbname=www_justice_plus',
             'username' => '<b><i>root</i></b>',
-            'password' => '<b><i>xaiTIVP7kB$oHuJecEooq#YsziVvVAzW</i></b>',
+            'password' => '<b><i>${justice.mysql.password}</i></b>',
             'charset' => 'utf8',
         ],
         'redis' => [
             'class' => 'yii\redis\Connection',
-            'hostname' => '<b><i>127.0.0.1</i></b>',
+            'hostname' => '<b><i>${justice.redis}</i></b>',
             'port' => 6379,
             'database' => 15,
         ],
         'rabbitMQ' => [
             'class' => \common\components\queue\BasicRabbitMQProducer::class,
-            'host' => '<b><i>127.0.0.1</i></b>',
+            'host' => '<b><i>${justice.rabbitmq}</i></b>',
             'port' => 5672,
             'user' => 'justice',
-            'password' => '<b><i>justice</i></b>',
+            'password' => '<b><i>${justice.rabbitmq.password}</i></b>',
             'queueName' => 'justice',
             'exchangeName' => 'justice',
             'exchangeType' => 'topic',
@@ -222,34 +202,30 @@ bind <b><i>192.168.216.128</i></b>
 - Update config `justice.plus/environments/prod/common/config/params-local.php` for sentry:
 <pre>
 [
-    'sentryDSN' => '<b><i>http://c310ce509417482a98ecf42aaa2fce3d:056872ff2da64d93b121fa615899406e@127.0.0.1:12000/2</i></b>',
+    'sentryDSN' => '<b><i>${sentry_url}</i></b>',
 ];
 </pre>
 
 - Init yii2 project
 ```bash
-# cd /var/www/justice.plus
-# php init --env=Production --overwrite=All
-# php yii migrate
-# chown -R www-data:www-data /var/www/justice.plus
+cd /var/www/justice.plus
+php init --env=Production --overwrite=All
+php yii migrate
+chown -R www-data:www-data /var/www/justice.plus
 ```
 
-- Install Openresty
+- Install Nginx
 ```bash
-# wget -qO - https://openresty.org/package/pubkey.gpg | apt-key add -
-# apt -y install software-properties-common
-# add-apt-repository -y "deb http://openresty.org/package/ubuntu $(lsb_release -sc) main"
-# apt update -y
-# apt install -y openresty
+apt install -y nginx
 ```
 
-- Edit `/etc/php/7.1/fpm/pool.d/www.conf` to change PHP-FPM from listening on unix socket to listening on TCP/IP port:
-```bash
+- Edit `/etc/php/7.2/fpm/pool.d/www.conf` to change PHP-FPM from listening on unix socket to listening on TCP/IP port:
+```ini
 - listen = /run/php/php7.1-fpm.sock
 + listen = 127.0.0.1:9000
 ``` 
 
-- Sample server block of `/usr/local/openresty/nginx/conf/nginx.conf`
+- Sample server block of `/etc/nginx/conf.d/justice.plus.conf`
 ```
 server {
     listen 80;
@@ -298,8 +274,8 @@ server {
 
 - Start nginx and PHP-fpm
 ```bash
-# /etc/init.d/openresty start
-# /etc/init.d/php7.1-fpm start
+/etc/init.d/nginx start
+/etc/init.d/php7.2-fpm start
 ```
 
 ## Dispatcher
@@ -307,7 +283,7 @@ server {
 - Dispatcher requires [JDK8](http://www.oracle.com/technetwork/pt/java/javase/downloads/jdk8-downloads-2133151.html) and [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
 
 - Update `conf/catalina.properties`, ${ENV} must be in one of `local`, `test` or `prod`:
-```
+```ini
 + sentry.dsn=${DSN}
 + spring.profiles.active=${ENV}
 ```
@@ -316,8 +292,8 @@ server {
 
 - Deploy .war and start Tomcat
 ```bash
-# mkdir -p /var/log/justice/code
-# bin/startup.sh
+mkdir -p /var/log/justice/code
+bin/startup.sh
 ```
 
 ## Sandbox
@@ -326,17 +302,17 @@ server {
 
 - Checkout project in `/opt`
 ```bash
-# cd /opt
-# git clone git@github.com:justice-oj/sandbox.git
+cd /opt
+git clone git@github.com:justice-oj/sandbox.git
 ```
 
 - Init(compile binaries, enable [cgroup auto clean-up](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/sec-common_tunable_parameters), etc)
 ```bash
-# cd /opt/justice-sandbox
-# ./build.sh
+cd /opt/justice-sandbox
+./build.sh
 ```
 
 - C/C++ language support
 ```bash
-# apt install -y gcc g++
+apt install -y gcc g++
 ```
