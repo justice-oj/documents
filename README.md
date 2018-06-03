@@ -314,15 +314,10 @@ mkdir -p /var/log/justice/code
 apt install -y golang-go
 ```
 
-- Checkout project in `/opt/justice-sandbox`
+- Init Project(compile binaries, enable [cgroup auto clean-up](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/sec-common_tunable_parameters), etc)
 ```bash
-cd /opt
-git clone git@github.com:justice-oj/sandbox.git justice-sandbox
-```
-
-- Init(compile binaries, enable [cgroup auto clean-up](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/sec-common_tunable_parameters), etc)
-```bash
-cd /opt/justice-sandbox
+go get github.com/justice-oj/sandbox
+cd ${GOPATH}/src/github.com/justice-oj/sandbox/
 ./build.sh
 ```
 
