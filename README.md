@@ -140,7 +140,7 @@ curl -o /usr/local/bin/composer https://getcomposer.org/composer.phar && chmod +
 
 ```bash
 mkdir -p /var/www
-git clone git@github.com:justice-oj/frontend.git /var/www/justice.plus
+git clone https://github.com/justice-oj/frontend.git /var/www/justice.plus
 
 cd /var/www/justice.plus
 composer global require "fxp/composer-asset-plugin:^1.4.2"
