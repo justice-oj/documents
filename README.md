@@ -54,6 +54,7 @@ mysql_secure_installation
 - Create database for our app:
 ```mysql
 CREATE DATABASE www_justice_plus;
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${justice.mysql}';
 ```
 
 - Update `/etc/mysql/mysql.conf.d/mysqld.cnf`, and replace `${justice.mysql}` with your own IP address:
