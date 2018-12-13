@@ -113,14 +113,6 @@ bind <b><i>${justice.redis}</i></b>
 /etc/init.d/redis-server restart
 ```
 
-### Sentry
-
-```bash
-apt install -y make docker.io
-```
-
-- Follow [this instruction](https://docs.sentry.io/server/installation/docker/) to install Sentry.
-
 ## Frontend
 
 ### PHP
@@ -149,13 +141,6 @@ composer install
 ```
 
 #### **For Development environment**
-
-- Update config `justice.plus/environments/dev/common/config/params-local.php` for sentry:
-<pre>
-[
-    'sentryDSN' => '<b><i>${sentry_url}</i></b>',
-];
-</pre>
 
 - Init yii2 project
 ```bash
@@ -197,13 +182,6 @@ php yii serve --docroot="admin/web" localhost:9999
             'exchangeType' => 'topic',
         ],
     ],
-];
-</pre>
-
-- Update config `justice.plus/environments/prod/common/config/params-local.php` for sentry:
-<pre>
-[
-    'sentryDSN' => '<b><i>${sentry_url}</i></b>',
 ];
 </pre>
 
@@ -284,22 +262,21 @@ server {
 - Install JDK 8
 ```bash
 cd /opt
-wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u172-b11/a58eab1ec242421181065cdc37240b08/jdk-8u172-linux-x64.tar.gz
-tar zxf jdk-8u172-linux-x64.tar.gz
-ln -s jdk1.8.0_172 jdk
+wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" https://download.oracle.com/otn-pub/java/jdk/8u191-b12/2787e4a523244c269598db4e85c51e0c/jdk-8u191-linux-x64.tar.gz
+tar zxf jdk-8u191-linux-x64.tar.gz
+ln -s jdk1.8.0_191 jdk
 ```
 
 - Install Tomcat 8.5
 ```bash
 cd /opt
-wget http://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.31/bin/apache-tomcat-8.5.31.tar.gz
-tar zxf apache-tomcat-8.5.31.tar.gz
-mv apache-tomcat-8.5.31 tomcat-justice-dispatcher
+wget https://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz
+tar zxf apache-tomcat-8.5.35.tar.gz
+mv apache-tomcat-8.5.35 tomcat-justice-dispatcher
 ```
 
 - Update `conf/catalina.properties`, ${ENV} must be in one of `local`, `test` or `prod`:
 ```ini
-+ sentry.dsn=${DSN}
 + spring.profiles.active=${ENV}
 ```
 
