@@ -29,7 +29,7 @@ The picture above describes the main judging process of `Justice`:
 
 - `justice-dispatcher` then updates MySQL / Redis with the result decoded from `justice-sandbox`.
 
-For now [Justice](https://www.justice.plus/) is tested on [Ubuntu 18.04 LTS](http://releases.ubuntu.com/18.04/) only, migrating the following instructions to any other dist may cause security issues.
+For now [Justice](https://www.justice.plus/) is tested on [Debian Buster](https://wiki.debian.org/DebianBuster) only, migrating the following instructions to any other dist may cause security issues.
 
 ## Components
 
@@ -47,14 +47,15 @@ Replace the following ip addresses in your hosts file for justice dev environmen
 
 - Install MySQL Server:
 ```bash
-apt install -y mysql-server
+apt install mariadb-server
 mysql_secure_installation
 ```
 
 - Create database for our app:
 ```mysql
 CREATE DATABASE www_justice_plus;
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${justice.mysql}';
+CREATE USER 'root'@'%' IDENTIFIED BY '${PASSWORD}';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 ```
 
 - Update `/etc/mysql/mysql.conf.d/mysqld.cnf`, and replace `${justice.mysql}` with your own IP address:
@@ -98,8 +99,6 @@ NODE_PORT=5672
 
 - Install Redis
 ```bash
-add-apt-repository ppa:chris-lea/redis-server
-apt update -y
 apt install -y redis-server
 ```
 
@@ -117,16 +116,17 @@ bind <b><i>${justice.redis}</i></b>
 
 ### PHP
 
-- Install PHP 7.2:
+- Install PHP 7.3:
 ```bash
-add-apt-repository -y ppa:ondrej/php
-apt update -y
-apt install -y php7.2-xml php7.2-mbstring php7.2-zip php7.2-mysql php7.2 php7.2-opcache php7.2-json php7.2-xmlrpc php7.2-curl php7.2-bz2 php7.2-cgi php7.2-cli php7.2-fpm php7.2-gmp php7.2-common php7.2-bcmath php7.2-gd
+apt install -y php7.3-xml php7.3-mbstring php7.3-zip php7.3-mysql php7.3 \
+php7.3-opcache php7.3-json php7.3-xmlrpc php7.3-curl php7.3-bz2 php7.3-cgi \
+php7.3-cli php7.3-fpm php7.3-gmp php7.3-common php7.3-bcmath php7.3-gd
 ```
 
 - Composer
 ```bash
-curl -o /usr/local/bin/composer https://getcomposer.org/composer.phar && chmod +x /usr/local/bin/composer
+curl -o /usr/local/bin/composer https://getcomposer.org/composer.phar
+chmod +x /usr/local/bin/composer
 ```
 
 ### Init project
@@ -198,9 +198,9 @@ chown -R www-data:www-data /var/www/justice.plus
 apt install -y nginx
 ```
 
-- Edit `/etc/php/7.2/fpm/pool.d/www.conf` to change PHP-FPM from listening on unix socket to listening on TCP/IP port:
+- Edit `/etc/php/7.3/fpm/pool.d/www.conf` to change PHP-FPM from listening on unix socket to listening on TCP/IP port:
 ```ini
-- listen = /run/php/php7.1-fpm.sock
+- listen = /run/php/php7.3-fpm.sock
 + listen = 127.0.0.1:9000
 ``` 
 
@@ -254,25 +254,22 @@ server {
 - Start nginx and PHP-fpm
 ```bash
 /etc/init.d/nginx start
-/etc/init.d/php7.2-fpm start
+/etc/init.d/php7.3-fpm start
 ```
 
 ## Dispatcher
 
-- Install JDK 8
+- Install openjdk-11
 ```bash
-cd /opt
-wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" https://download.oracle.com/otn-pub/java/jdk/8u191-b12/2787e4a523244c269598db4e85c51e0c/jdk-8u191-linux-x64.tar.gz
-tar zxf jdk-8u191-linux-x64.tar.gz
-ln -s jdk1.8.0_191 jdk
+apt install openjdk-11-jdk
 ```
 
-- Install Tomcat 8.5
+- Install Tomcat 9
 ```bash
 cd /opt
-wget https://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz
-tar zxf apache-tomcat-8.5.35.tar.gz
-mv apache-tomcat-8.5.35 tomcat-justice-dispatcher
+wget http://apache.cs.utah.edu/tomcat/tomcat-9/v9.0.22/bin/apache-tomcat-9.0.22.tar.gz
+tar zxf apache-tomcat-9.0.22.tar.gz
+mv apache-tomcat-9.0.22 dispatcher
 ```
 
 - Update `conf/catalina.properties`, ${ENV} must be in one of `local`, `test` or `prod`:
@@ -290,15 +287,13 @@ mkdir -p /var/log/justice/code
 
 ## Sandbox
 
-- Install Golang
-```bash
-apt install -y golang-go
-```
+- Make sure that Golang version >= 1.12
 
 - Init Project(compile binaries, enable [cgroup auto clean-up](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/sec-common_tunable_parameters), etc)
 ```bash
-go get github.com/justice-oj/sandbox
-cd ${GOPATH}/src/github.com/justice-oj/sandbox/
+cd /opt
+git clone https://github.com/justice-oj/sandbox.git
+cd /opt/sandbox/
 ./build.sh
 ```
 
