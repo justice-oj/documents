@@ -51,8 +51,8 @@ apt install mariadb-server
 mysql_secure_installation
 ```
 
-- Create database for our app:
-```mysql
+- Create a database for our app:
+```
 CREATE DATABASE www_justice_plus;
 CREATE USER 'root'@'%' IDENTIFIED BY '${PASSWORD}';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
@@ -116,16 +116,16 @@ bind <b><i>${justice.redis}</i></b>
 
 ### PHP
 
-- Install PHP 7.3:
+- Install PHP 7.4:
 ```bash
-apt install -y php7.3-xml php7.3-mbstring php7.3-zip php7.3-mysql php7.3 \
-php7.3-opcache php7.3-json php7.3-xmlrpc php7.3-curl php7.3-bz2 php7.3-cgi \
-php7.3-cli php7.3-fpm php7.3-gmp php7.3-common php7.3-bcmath php7.3-gd
+apt install -y php7.4-xml php7.4-mbstring php7.4-zip php7.4-mysql php7.4 \
+php7.4-opcache php7.4-json php7.4-curl php7.4-bz2 php7.4-cgi php7.4-cli \
+php7.4-fpm php7.4-gmp php7.4-common php7.4-bcmath php7.4-gd
 ```
 
 - Composer
 ```bash
-curl -o /usr/local/bin/composer https://getcomposer.org/composer.phar
+curl -o /usr/local/bin/composer https://getcomposer.org/composer-stable.phar
 chmod +x /usr/local/bin/composer
 ```
 
@@ -198,9 +198,9 @@ chown -R www-data:www-data /var/www/justice.plus
 apt install -y nginx
 ```
 
-- Edit `/etc/php/7.3/fpm/pool.d/www.conf` to change PHP-FPM from listening on unix socket to listening on TCP/IP port:
+- Edit `/etc/php/7.4/fpm/pool.d/www.conf` to change PHP-FPM from listening on unix socket to listening on TCP/IP port:
 ```ini
-- listen = /run/php/php7.3-fpm.sock
+- listen = /run/php/php7.4-fpm.sock
 + listen = 127.0.0.1:9000
 ``` 
 
@@ -254,7 +254,7 @@ server {
 - Start nginx and PHP-fpm
 ```bash
 /etc/init.d/nginx start
-/etc/init.d/php7.3-fpm start
+/etc/init.d/php7.4-fpm start
 ```
 
 ## Dispatcher
@@ -267,9 +267,9 @@ apt install openjdk-11-jdk
 - Install Tomcat 9
 ```bash
 cd /opt
-wget http://apache.cs.utah.edu/tomcat/tomcat-9/v9.0.22/bin/apache-tomcat-9.0.22.tar.gz
-tar zxf apache-tomcat-9.0.22.tar.gz
-mv apache-tomcat-9.0.22 dispatcher
+wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.37/bin/apache-tomcat-9.0.37.tar.gz
+tar zxf apache-tomcat-9.0.37.tar.gz
+mv apache-tomcat-9.0.37 dispatcher
 ```
 
 - Update `conf/catalina.properties`, ${ENV} must be in one of `local`, `test` or `prod`:
@@ -287,7 +287,7 @@ mkdir -p /var/log/justice/code
 
 ## Sandbox
 
-- Make sure that Golang version >= 1.12
+- Make sure Golang version >= 1.14
 
 - Init Project(compile binaries, enable [cgroup auto clean-up](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/resource_management_guide/sec-common_tunable_parameters), etc)
 ```bash
